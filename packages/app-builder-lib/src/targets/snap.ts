@@ -273,14 +273,6 @@ function findSnapPublishConfig(config?: Configuration): SnapStoreOptions | null 
     return null
   }
 
-  if (config.snap?.publish) {
-    const configCandidate = findSnapPublishConfigInPublishNode(config.snap.publish)
-
-    if (configCandidate) {
-      return configCandidate
-    }
-  }
-
   if (config.linux?.publish) {
     const configCandidate = findSnapPublishConfigInPublishNode(config.linux.publish)
 

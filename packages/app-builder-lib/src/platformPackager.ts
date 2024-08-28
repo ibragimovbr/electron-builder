@@ -152,7 +152,7 @@ export abstract class PlatformPackager<DC extends PlatformSpecificBuildOptions> 
       await subTaskManager.awaitTasks()
 
       for (const target of targets) {
-        if (!target.isAsyncSupported && !this.info.cancellationToken.cancelled) {
+        if (!target.isAsyncSupported) {
           await target.build(appOutDir, arch)
         }
       }
@@ -778,15 +778,10 @@ async function resolveModule<T>(type: string | undefined, name: string): Promise
       const fileUrl = pathToFileURL(name).href
       return await eval("import('" + fileUrl + "')")
     }
-  } catch (error: any) {
-    log.debug({ moduleName: name, message: error.message ?? error.stack }, "Unable to dynamically import hook, falling back to `require`")
+  } catch (error) {
+    log.debug({ moduleName: name }, "Unable to dynamically import hook, falling back to `require`")
   }
-  try {
-    return require(name)
-  } catch (error: any) {
-    log.error({ moduleName: name, message: error.message ?? error.stack }, "Unable to `require` hook")
-    throw new Error(error.message ?? error.stack)
-  }
+  return require(name)
 }
 
 export async function resolveFunction<T>(type: string | undefined, executor: T | string, name: string): Promise<T> {

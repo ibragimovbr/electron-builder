@@ -1,13 +1,12 @@
 import BluebirdPromise from "bluebird-lst"
 import { CONCURRENCY } from "builder-util"
-import { lstat, readdir, lstatSync } from "fs-extra"
+import { lstat, readdir } from "fs-extra"
 import * as path from "path"
 import { excludedNames, FileMatcher } from "../fileMatcher"
 import { Packager } from "../packager"
 import { resolveFunction } from "../platformPackager"
 import { FileCopyHelper } from "./AppFileWalker"
 import { NodeModuleInfo } from "./packageDependencies"
-import { realpathSync } from "fs"
 
 const excludedFiles = new Set(
   [".DS_Store", "node_modules" /* already in the queue */, "CHANGELOG.md", "ChangeLog", "changelog.md", "Changelog.md", "Changelog", "binding.gyp", ".npmignore"].concat(
@@ -45,10 +44,8 @@ export class NodeModuleCopyHelper extends FileCopyHelper {
 
     const onNodeModuleFile = await resolveFunction(this.packager.appInfo.type, this.packager.config.onNodeModuleFile, "onNodeModuleFile")
 
-    const result: Array<string | undefined> = []
+    const result: Array<string> = []
     const queue: Array<string> = []
-    const emptyDirs: Set<string> = new Set()
-    const symlinkFiles: Map<string, number> = new Map()
     const tmpPath = moduleInfo.dir
     const moduleName = moduleInfo.name
     queue.length = 1
@@ -76,9 +73,7 @@ export class NodeModuleCopyHelper extends FileCopyHelper {
             return null
           }
 
-          // check if filematcher matches the files array as more important than the default excluded files.
-          const fileMatched = filter != null && filter(dirPath, lstatSync(dirPath))
-          if (!fileMatched || !forceIncluded || !!this.packager.config.disableDefaultIgnoredFiles) {
+          if (!forceIncluded) {
             for (const ext of nodeModuleExcludedExts) {
               if (name.endsWith(ext)) {
                 return null
@@ -135,19 +130,10 @@ export class NodeModuleCopyHelper extends FileCopyHelper {
         CONCURRENCY
       )
 
-      let isEmpty = true
       for (const child of sortedFilePaths) {
         if (child != null) {
           result.push(child)
-          if (this.metadata.get(child)?.isSymbolicLink()) {
-            symlinkFiles.set(child, result.length - 1)
-          }
-          isEmpty = false
         }
-      }
-
-      if (isEmpty) {
-        emptyDirs.add(dirPath)
       }
 
       dirs.sort()
@@ -155,14 +141,6 @@ export class NodeModuleCopyHelper extends FileCopyHelper {
         queue.push(dirPath + path.sep + child)
       }
     }
-
-    for (const [file, index] of symlinkFiles) {
-      const resolvedPath = realpathSync(file)
-      if (emptyDirs.has(resolvedPath)) {
-        // delete symlink file if target is a empty dir
-        result[index] = undefined
-      }
-    }
-    return result.filter((it): it is string => it !== undefined)
+    return result
   }
 }

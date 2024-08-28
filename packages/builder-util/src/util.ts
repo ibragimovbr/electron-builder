@@ -1,5 +1,5 @@
 import { appBuilderPath } from "app-builder-bin"
-import { CancellationToken, safeStringifyJson } from "builder-util-runtime"
+import { safeStringifyJson } from "builder-util-runtime"
 import * as chalk from "chalk"
 import { ChildProcess, execFile, ExecFileOptions, SpawnOptions } from "child_process"
 import { spawn as _spawn } from "cross-spawn"
@@ -408,12 +408,11 @@ export async function executeAppBuilder(
 }
 
 export async function retry<T>(task: () => Promise<T>, retryCount: number, interval: number, backoff = 0, attempt = 0, shouldRetry?: (e: any) => boolean): Promise<T> {
-  const cancellationToken = new CancellationToken()
   try {
     return await task()
   } catch (error: any) {
     log.info(`Above command failed, retrying ${retryCount} more times`)
-    if ((shouldRetry?.(error) ?? true) && retryCount > 0 && !cancellationToken.cancelled) {
+    if ((shouldRetry?.(error) ?? true) && retryCount > 0) {
       await new Promise(resolve => setTimeout(resolve, interval + backoff * attempt))
       return await retry(task, retryCount - 1, interval, backoff, attempt + 1, shouldRetry)
     } else {
