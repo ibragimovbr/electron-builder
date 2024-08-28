@@ -123,4 +123,4 @@ const LEVEL_TO_COLOR: { [index: string]: Chalk } = {
   debug: chalk.white,
 }
 
-export const log = new Logger('console')
+export const log = new Logger(process.stdout)

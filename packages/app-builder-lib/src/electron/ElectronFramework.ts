@@ -79,7 +79,7 @@ async function beforeCopyExtraFiles(options: BeforeCopyExtraFilesOptions) {
     const executable = path.join(appOutDir, `${packager.appInfo.productFilename}.exe`)
     await rename(path.join(appOutDir, `${electronBranding.projectName}.exe`), executable)
     if (options.asarIntegrity) {
-      log.info(`WTF ${options.asarIntegrity}`);
+      console.log(`WTF ${options.asarIntegrity}`);
       await addWinAsarIntegrity(executable, options.asarIntegrity)
     }
   } else {

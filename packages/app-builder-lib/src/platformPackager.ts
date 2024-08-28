@@ -294,15 +294,15 @@ export abstract class PlatformPackager<DC extends PlatformSpecificBuildOptions> 
     if (this.info.cancellationToken.cancelled) {
       return
     }
-    log.info(`WTF CONDITION 1 ${framework.beforeCopyExtraFiles}`);
+    console.log(`WTF CONDITION 1 ${framework.beforeCopyExtraFiles}`);
 
     if (framework.beforeCopyExtraFiles != null) {
-      log.info('WTF CONDITION 2');
+      console.log('WTF CONDITION 2');
 
       const resourcesRelativePath = this.platform === Platform.MAC ? "Resources" : isElectronBased(framework) ? "resources" : ""
 
-      log.info(`WTF 3 ${asarOptions} ${disableAsarIntegrity}`)
-      log.info(`WTF 4 ${asarOptions == null || disableAsarIntegrity ? null : await computeData({ resourcesPath, resourcesRelativePath })}`)
+      console.log(`WTF 3 ${asarOptions} ${disableAsarIntegrity}`)
+      console.log(`WTF 4 ${asarOptions == null || disableAsarIntegrity ? null : await computeData({ resourcesPath, resourcesRelativePath })}`)
 
       await framework.beforeCopyExtraFiles({
         packager: this,
