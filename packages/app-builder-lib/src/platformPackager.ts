@@ -1,6 +1,5 @@
 import BluebirdPromise from "bluebird-lst"
-import { Arch, asArray, AsyncTaskManager, debug, DebugLogger, deepAssign, getArchSuffix, InvalidConfigurationError, isEmptyOrSpaces, log } from "builder-util"
-import { defaultArchFromString, getArtifactArchName, FileTransformer, statOrNull, orIfFileNotExist } from "builder-util"
+import { Arch, asArray, AsyncTaskManager, debug, DebugLogger, deepAssign, defaultArchFromString, FileTransformer, getArchSuffix, getArtifactArchName, InvalidConfigurationError, isEmptyOrSpaces, log, orIfFileNotExist, statOrNull } from "builder-util"
 import { readdir } from "fs/promises"
 import { Lazy } from "lazy-val"
 import { Minimatch } from "minimatch"
@@ -295,9 +294,15 @@ export abstract class PlatformPackager<DC extends PlatformSpecificBuildOptions> 
     if (this.info.cancellationToken.cancelled) {
       return
     }
+    log.info(`WTF CONDITION 1 ${framework.beforeCopyExtraFiles}`);
 
     if (framework.beforeCopyExtraFiles != null) {
+      log.info('WTF CONDITION 2');
+
       const resourcesRelativePath = this.platform === Platform.MAC ? "Resources" : isElectronBased(framework) ? "resources" : ""
+
+      log.info(`WTF 3 ${asarOptions} ${disableAsarIntegrity}`)
+      log.info(`WTF 4 ${asarOptions == null || disableAsarIntegrity ? null : await computeData({ resourcesPath, resourcesRelativePath })}`)
 
       await framework.beforeCopyExtraFiles({
         packager: this,

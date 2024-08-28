@@ -1,7 +1,7 @@
 import BluebirdPromise from "bluebird-lst"
-import { asArray, executeAppBuilder, log } from "builder-util"
-import { CONCURRENCY, copyDir, DO_NOT_USE_HARD_LINKS, statOrNull, unlinkIfExists } from "builder-util"
+import { asArray, CONCURRENCY, copyDir, DO_NOT_USE_HARD_LINKS, executeAppBuilder, log, statOrNull, unlinkIfExists } from "builder-util"
 import { emptyDir, readdir, rename } from "fs-extra"
+import * as fs from "fs/promises"
 import * as path from "path"
 import { Configuration } from "../configuration"
 import { BeforeCopyExtraFilesOptions, Framework, PrepareApplicationStageDirectoryOptions } from "../Framework"
@@ -10,9 +10,8 @@ import { LinuxPackager } from "../linuxPackager"
 import { MacPackager } from "../macPackager"
 import { getTemplatePath } from "../util/pathManager"
 import { createMacApp } from "./electronMac"
-import { addWinAsarIntegrity } from "./electronWin"
 import { computeElectronVersion, getElectronVersionFromInstalled } from "./electronVersion"
-import * as fs from "fs/promises"
+import { addWinAsarIntegrity } from "./electronWin"
 import injectFFMPEG from "./injectFFMPEG"
 
 export type ElectronPlatformName = "darwin" | "linux" | "win32" | "mas"
@@ -80,6 +79,7 @@ async function beforeCopyExtraFiles(options: BeforeCopyExtraFilesOptions) {
     const executable = path.join(appOutDir, `${packager.appInfo.productFilename}.exe`)
     await rename(path.join(appOutDir, `${electronBranding.projectName}.exe`), executable)
     if (options.asarIntegrity) {
+      log.info(`WTF ${options.asarIntegrity}`);
       await addWinAsarIntegrity(executable, options.asarIntegrity)
     }
   } else {
