@@ -1,5 +1,5 @@
-import { Chalk } from "chalk"
 import * as chalk from "chalk"
+import { Chalk } from "chalk"
 import _debug from "debug"
 import WritableStream = NodeJS.WritableStream
 
@@ -123,4 +123,4 @@ const LEVEL_TO_COLOR: { [index: string]: Chalk } = {
   debug: chalk.white,
 }
 
-export const log = new Logger(process.stdout)
+export const log = new Logger('console')
